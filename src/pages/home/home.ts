@@ -1,3 +1,4 @@
+import { Group } from "./../../models/Group";
 import { WelcomePage } from "./../welcome/welcome";
 import { CreateTodoPage } from "./../create-todo/create-todo";
 import { TodoDetailsPage } from "./../todo-details/todo-details";
@@ -9,7 +10,7 @@ import { ToastController } from "ionic-angular";
 import { Storage } from "@ionic/storage";
 import { Observable } from "rxjs/Observable";
 import { AngularFireDatabase } from "angularfire2/database";
-import firebase from "firebase";
+import firebase, { User } from "firebase";
 
 @Component({
   selector: "page-home",
@@ -20,6 +21,10 @@ export class HomePage {
   fdbItems: Observable<any[]>;
   fdbArray = [];
   page_title: string = "My Fuhrer";
+
+  groups: Group[] = [];
+
+  isOnline = true;
 
   constructor(
     public navCtrl: NavController,
@@ -43,46 +48,24 @@ export class HomePage {
     // as if this is not the first load
 
     let user: any;
-    this.storage.get("user").then(userData => {
-      console.log("userdata :" + JSON.stringify(userData));
-      if (userData != null) {
-        console.log("Homepage : " + userData);
-        // User is signed in.
 
-        //Toast greeting the user
-        let toast = this.toastCtrl.create({
-          message: "Welcome back " + userData["name"],
-          duration: 3000,
-          position: "bottom",
-        });
-        toast.present();
+    this.storage.get("user").then(userData => {
+      // console.log("userdata :" + JSON.stringify(userData));
+      if (userData != null) {
+        // console.log("Homepage : " + userData);
+        // User is signed in.
 
         this.page_title = userData["name"];
 
         user = userData;
 
-        this.fdb
-      .list<TodoItems>("/myItems/")
-      .valueChanges()
-      .subscribe(_datas => {
-        let temp: TodoItems[] = [];
-        _datas.forEach(element => {
-          temp.push(
-            new TodoItems(
-              element.id,
-              element.date,
-              element.todos,
-              element.title,
-              element.subTitle,
-              element.isDeadlineSet,
-              element.deadlineDate,
-              element.deadlineTime
-            )
-          );
+        //Toast greeting the user
+        let toast = this.toastCtrl.create({
+          message: "Welcome back " + userData["name"],
+          duration: 3000,
+          position: "bottom"
         });
-        this.items = temp;
-        console.log(this.items);
-      });
+        toast.present();
       } else {
         // No userData is signed in.
         this.navCtrl.push(WelcomePage);
@@ -96,6 +79,53 @@ export class HomePage {
     this.storage.get("name").then(val => {
       console.log("Your age is", val);
     });
+  }
+
+  //this is to get group from database and local
+  //using the latest and sync the older version.
+  setupGroups(user: User) {
+    let groupIds: string[] = user.getGroupIds();
+
+    if (this.isOnline) {
+      groupIds.forEach(groupId => {
+        this.fdb
+          .object<Group>("/groups/" + groupId)
+          .valueChanges()
+          .subscribe(_data => {
+            this.groups.push(_data);
+            this.storage.set(groupId,_data);
+          });
+      });
+    }else{
+      groupIds.forEach(groupId => {
+        this.storage.get(groupId).then(_group =>{
+          this.groups.push(_group);
+        })
+      })
+    }
+
+    // this.fdb
+    //   .list<TodoItems>("/myItems/")
+    //   .valueChanges()
+    //   .subscribe(_datas => {
+    //     let temp: TodoItems[] = [];
+    //     _datas.forEach(element => {
+    //       temp.push(
+    //         new TodoItems(
+    //           element.id,
+    //           element.date,
+    //           element.todos,
+    //           element.title,
+    //           element.subTitle,
+    //           element.isDeadlineSet,
+    //           element.deadlineDate,
+    //           element.deadlineTime
+    //         )
+    //       );
+    //     });
+    //     this.items = temp;
+    //     console.log(this.items);
+    //   });
   }
 
   isFirstLoad(storage: Storage): boolean {
@@ -112,4 +142,6 @@ export class HomePage {
   addTodoList() {
     this.navCtrl.push(CreateTodoPage, { params: this.items });
   }
+
+  addGroup() {}
 }

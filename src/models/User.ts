@@ -15,8 +15,9 @@ export class User {
     email: string,
     phoneNumber: number = 0,
     id: string,
-    timelineIds: string[] = [],
-    groupIds: string[] = []
+    groupIds: string[] = [],
+    personalTimelineIds: string[] = [],
+    personalTimeSchedulaIds: string[] = []
   ) {
     this.name = name;
     this.email = email;
@@ -25,6 +26,11 @@ export class User {
 
     this.lastChangeTime = Date.now();
   }
+
+  public getGroupIds(): string[] {
+    return this.groupIds;
+  }
+
   public checkFirebase(
     storage: Storage,
     fdb: AngularFireDatabase,
