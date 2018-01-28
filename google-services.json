@@ -1,0 +1,62 @@
+{
+  "project_info": {
+    "project_number": "797472639847",
+    "firebase_url": "https://mugger-tools.firebaseio.com",
+    "project_id": "mugger-tools",
+    "storage_bucket": "mugger-tools.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:797472639847:android:a2f1473067f36dc4",
+        "android_client_info": {
+          "package_name": "dunamikos.studio.mugger"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "797472639847-mv8k7bg8jqt0p9frjieu9jjveq7t69me.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "dunamikos.studio.mugger",
+            "certificate_hash": "bf7aca258aeec3e0f9b33cf028947092493e6fad"
+          }
+        },
+        {
+          "client_id": "797472639847-mphniu062nhle2i7dun64v7komac530a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAEluIjY4P4a6QXcCK9vytkv5FF452TSeY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "797472639847-mphniu062nhle2i7dun64v7komac530a.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "797472639847-shie0v53p7fk7fdbd8h3qftes7jqbfal.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "dunamikos.studio.mugger"
+              }
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
