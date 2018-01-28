@@ -59,6 +59,9 @@ export class HomePage {
 
         user = userData;
 
+        //TODO:urgent DEBUG this function
+        this.setupGroups(user);
+
         //Toast greeting the user
         let toast = this.toastCtrl.create({
           message: "Welcome back " + userData["name"],
