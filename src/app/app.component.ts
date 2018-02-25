@@ -1,3 +1,5 @@
+import { CreateTimelinePage } from './../pages/create-timeline/create-timeline';
+import { CreateGroupPage } from './../pages/create-group/create-group';
 import { HomePage } from "./../pages/home/home";
 
 import { Component } from "@angular/core";

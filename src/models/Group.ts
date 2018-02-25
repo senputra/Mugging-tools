@@ -1,6 +1,6 @@
 export class Group {
 
-    lockGroup: boolean = true; //no new member can join.
+    lockGroup: boolean = false; //no new member can join.
 
     name: string;
     adminId: string[]; //the user who takes control, may read write kick and make people an admin

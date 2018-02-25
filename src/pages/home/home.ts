@@ -1,3 +1,4 @@
+import { User } from './../../models/User';
 import { Group } from "./../../models/Group";
 import { WelcomePage } from "./../welcome/welcome";
 import { CreateTodoPage } from "./../create-todo/create-todo";
@@ -10,7 +11,7 @@ import { ToastController } from "ionic-angular";
 import { Storage } from "@ionic/storage";
 import { Observable } from "rxjs/Observable";
 import { AngularFireDatabase } from "angularfire2/database";
-import firebase, { User } from "firebase";
+import firebase from "firebase";
 
 @Component({
   selector: "page-home",
@@ -49,14 +50,24 @@ export class HomePage {
 
     let user: any;
 
+    //check local userdata
     this.storage.get("user").then(userData => {
       // console.log("userdata :" + JSON.stringify(userData));
       if (userData != null) {
         // console.log("Homepage : " + userData);
         // User is signed in.
-
         this.page_title = userData["name"];
 
+        //check if device is online and update user
+        if(this.isOnline){
+          this.fdb.object("/users/"+userData.id).valueChanges()
+          .subscribe(_data =>{
+            let onlineUserData:any = _data;
+            if (onlineUserData.lastChangeTime < userData.lastChangeTime){
+              this.fdb.list("/users/"+userData.id).update("lastChangeTime",userData.lastChangeTime);
+            }
+          });
+        }
         user = userData;
 
         //TODO:urgent DEBUG this function
@@ -74,27 +85,31 @@ export class HomePage {
         this.navCtrl.push(WelcomePage);
       }
     });
-
-    // set a key/value
-    this.storage.set("name", "Max");
-
-    // Or to get a key/value pair
-    this.storage.get("name").then(val => {
-      console.log("Your age is", val);
-    });
   }
 
+
+  demoAddGroupId(user:User){
+    if (user.groupIds ==null){
+      user.groupIds = [];
+    }
+    user.groupIds.push("GP123456789");
+    user.groupIds.push("GP123456780");
+    return user;
+  }
   //this is to get group from database and local
   //using the latest and sync the older version.
-  setupGroups(user: User) {
-    let groupIds: string[] = user.getGroupIds();
-
+  setupGroups(user: User) { //RETRIEVING FROM FDB IS WORKING
+    user = this.demoAddGroupId(user);
+    let groupIds: string[] = user.groupIds;
+    //console.log(groupIds);
     if (this.isOnline) {
       groupIds.forEach(groupId => {
         this.fdb
           .object<Group>("/groups/" + groupId)
           .valueChanges()
           .subscribe(_data => {
+            console.log("retrieving group")
+            console.log(_data);
             this.groups.push(_data);
             this.storage.set(groupId,_data);
           });
@@ -106,29 +121,6 @@ export class HomePage {
         })
       })
     }
-
-    // this.fdb
-    //   .list<TodoItems>("/myItems/")
-    //   .valueChanges()
-    //   .subscribe(_datas => {
-    //     let temp: TodoItems[] = [];
-    //     _datas.forEach(element => {
-    //       temp.push(
-    //         new TodoItems(
-    //           element.id,
-    //           element.date,
-    //           element.todos,
-    //           element.title,
-    //           element.subTitle,
-    //           element.isDeadlineSet,
-    //           element.deadlineDate,
-    //           element.deadlineTime
-    //         )
-    //       );
-    //     });
-    //     this.items = temp;
-    //     console.log(this.items);
-    //   });
   }
 
   isFirstLoad(storage: Storage): boolean {

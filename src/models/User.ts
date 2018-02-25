@@ -27,7 +27,7 @@ export class User {
     this.lastChangeTime = Date.now();
   }
 
-  public getGroupIds(): string[] {
+  public getGroupIds(){
     return this.groupIds;
   }
 

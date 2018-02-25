@@ -11,6 +11,7 @@ import { SignupPage } from "./../pages/signup/signup";
 import { LoginPage } from "./../pages/login/login";
 import { WelcomePage } from "./../pages/welcome/welcome";
 import { CreateTodoPage } from "./../pages/create-todo/create-todo";
+import { CreateGroupPage } from "../pages/create-group/create-group";
 
 import { IonicStorageModule } from "@ionic/storage";
 import { AngularFireModule } from "angularfire2";
@@ -19,6 +20,7 @@ import {
   AngularFireDatabase
 } from "angularfire2/database";
 import {GooglePlus} from "@ionic-native/google-plus";
+import { CreateTimelinePage } from "../pages/create-timeline/create-timeline";
 
 let firebaseConfig = {
   apiKey: "AIzaSyCyU14VHwrPX1kXfCQ4D1AblQoECc_W-HI",
@@ -37,7 +39,9 @@ let firebaseConfig = {
     CreateTodoPage,
     WelcomePage,
     LoginPage,
-    SignupPage
+    SignupPage,
+    CreateGroupPage,
+    CreateTimelinePage
   ],
   imports: [
     BrowserModule,
@@ -54,7 +58,9 @@ let firebaseConfig = {
     CreateTodoPage,
     WelcomePage,
     LoginPage,
-    SignupPage
+    SignupPage,
+    CreateGroupPage,
+    CreateTimelinePage
   ],
   providers: [
     StatusBar,

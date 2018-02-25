@@ -1,3 +1,4 @@
+import { Matter } from './Matter';
 import { Day } from './Day';
 export class Timeline {
 
@@ -9,6 +10,7 @@ export class Timeline {
 
     //the days and the matters are linked together.
     days:Day[];
+    matters:Matter[];
 
     constructor(
         title: string,
