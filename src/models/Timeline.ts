@@ -1,4 +1,3 @@
-import { Matter } from './Matter';
 import { Day } from './Day';
 export class Timeline {
 
@@ -8,9 +7,8 @@ export class Timeline {
     adminId: string[]; //the user who takes control, may read write kick and make people an admin
     id: string; //id generated  ==> TLXXXXXXXXXX
 
-    //the days and the matters are linked together.
+    //In a day there are several agendas/matters
     days:Day[];
-    matters:Matter[];
 
     constructor(
         title: string,
@@ -20,6 +18,7 @@ export class Timeline {
         this.title = title;
         this.adminId = adminId;
         this.id = id;
+        this.days = [];
 
     }
 

@@ -20,4 +20,12 @@ export class Group {
         this.adminId = adminId;
         this.id = id;
     }
+
+    getName(){
+        return this.name;
+    }
+    
+    getId(){
+        return this.id;
+    }
 }

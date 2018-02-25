@@ -7,12 +7,24 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>createGroup</ion-title>
+    <ion-title>{{page_title}}</ion-title>
   </ion-navbar>
 
 </ion-header>
 
 
 <ion-content padding>
-<button ion-button block (click)="demoCreateGroup()"> Demo Create Group</button>
+  <ion-list no-lines>
+    <ion-item>
+      <h4 style="text-align: center">Type in your group name</h4>
+    </ion-item>
+
+    <ion-item>
+      <ion-input type="text" [(ngModel)]="name" (input)="onChangeTitle()"></ion-input>
+    </ion-item>
+
+  </ion-list>
+  <button ion-button full outline (click)="doCreateGroup()">leggo</button>
+
+  <button ion-button block (click)="demoCreateGroup()"> Demo Create Group</button>
 </ion-content>

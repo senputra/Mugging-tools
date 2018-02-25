@@ -17,6 +17,9 @@ import { IonicPage, NavController, NavParams } from "ionic-angular";
   templateUrl: "create-group.html"
 })
 export class CreateGroupPage {
+  page_title = "Create Group";
+  name: any;
+
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
@@ -42,22 +45,48 @@ export class CreateGroupPage {
   upload(group: Group) {
     //local----------
     this.storage.set(group.id, group);
-
-    this.storage.get(group.id).then(_data => {
-      console.log(_data);
-    });
     //------------------
 
     //online----------------
     this.fdb.object("/groups/" + group.id).set(group);
-    this.fdb
-      .object("/groups/" + group.id)
-      .valueChanges()
-      .subscribe(_data => {
-        let newGroup:any = _data
-        console.log("fdb" + newGroup.name);
-        console.log(_data);
-      });
-    //----------------
+    //-------------------
+  }
+
+  onChangeTitle() {
+    this.page_title = this.name;
+  }
+
+  updateUser(user, oldGroupId) {
+    //local----------
+    this.storage.set("user", user);
+    //------------------
+
+    //online----------------
+    this.fdb.object("/users/" + user.id).update({ groupIds: oldGroupId });
+    //-------------------
+  }
+
+  getCurrentGroups(currentUser) {
+    return currentUser.groupIds == null ? [] : currentUser.groupIds;
+  }
+
+  doCreateGroup() {
+    this.storage.get("user").then(_data => {
+      let currentUser = _data;
+      let oldGroupId = this.getCurrentGroups(_data);
+
+      let newGroup = new Group(
+        this.name,
+        [currentUser.id],
+        "GP" + Date.now().toString(36) + currentUser.id.slice(-5)
+      );
+      this.upload(newGroup);
+
+      oldGroupId.push(newGroup.id);
+      currentUser.groupIds = oldGroupId;
+
+      this.updateUser(currentUser, oldGroupId);
+      this.navCtrl.pop();
+    });
   }
 }

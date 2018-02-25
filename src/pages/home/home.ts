@@ -1,8 +1,9 @@
-import { User } from './../../models/User';
+import { AuthService } from './../../service/auth.service';
+import { GroupHomePage } from "./../group-home/group-home";
+import { User } from "./../../models/User";
 import { Group } from "./../../models/Group";
 import { WelcomePage } from "./../welcome/welcome";
 import { CreateTodoPage } from "./../create-todo/create-todo";
-import { TodoDetailsPage } from "./../todo-details/todo-details";
 import { TodoItems } from "./../../models/TodoItems";
 import { Component } from "@angular/core";
 import { NavController } from "ionic-angular";
@@ -18,7 +19,6 @@ import firebase from "firebase";
   templateUrl: "home.html"
 })
 export class HomePage {
-  items: TodoItems[] = [];
   fdbItems: Observable<any[]>;
   fdbArray = [];
   page_title: string = "My Fuhrer";
@@ -31,7 +31,8 @@ export class HomePage {
     public navCtrl: NavController,
     private storage: Storage,
     private fdb: AngularFireDatabase,
-    private toastCtrl: ToastController
+    private toastCtrl: ToastController,
+    public authService:AuthService
   ) {}
 
   ionViewDidLoad() {
@@ -48,8 +49,14 @@ export class HomePage {
     // if(this.isFirstLoad(storage)){
     // as if this is not the first load
 
-    let user: any;
+    if(this.authService.authenticated){
+      console.log("Authenticated");
+    }else{
+      this.authService.googleLogin();
+      console.log("nope");
+    }
 
+    let user: any;
     //check local userdata
     this.storage.get("user").then(userData => {
       // console.log("userdata :" + JSON.stringify(userData));
@@ -59,19 +66,28 @@ export class HomePage {
         this.page_title = userData["name"];
 
         //check if device is online and update user
-        if(this.isOnline){
-          this.fdb.object("/users/"+userData.id).valueChanges()
-          .subscribe(_data =>{
-            let onlineUserData:any = _data;
-            if (onlineUserData.lastChangeTime < userData.lastChangeTime){
-              this.fdb.list("/users/"+userData.id).update("lastChangeTime",userData.lastChangeTime);
-            }
-          });
+        if (this.isOnline) {
+          this.fdb
+            .object("/users/" + userData.id)
+            .valueChanges()
+            .subscribe(_data => {
+              let onlineUserData: any = _data;
+              if (onlineUserData.lastChangeTime < userData.lastChangeTime) {
+                this.fdb
+                  .list("/users/" + userData.id)
+                  .update("lastChangeTime", userData.lastChangeTime);
+                this.fdb
+                  .list("/users/" + userData.id)
+                  .update("groupIds", userData.groupIds);
+                user = userData;
+              } else {
+                user = _data;
+              }
+              this.storage.set("user", user);
+              this.setupGroups(user);
+            });
         }
-        user = userData;
-
-        //TODO:urgent DEBUG this function
-        this.setupGroups(user);
+        // user = userData;
 
         //Toast greeting the user
         let toast = this.toastCtrl.create({
@@ -82,14 +98,13 @@ export class HomePage {
         toast.present();
       } else {
         // No userData is signed in.
-        this.navCtrl.push(WelcomePage);
+        this.navCtrl.setRoot(WelcomePage);
       }
     });
   }
 
-
-  demoAddGroupId(user:User){
-    if (user.groupIds ==null){
+  demoAddGroupId(user: User) {
+    if (user.groupIds == null) {
       user.groupIds = [];
     }
     user.groupIds.push("GP123456789");
@@ -98,28 +113,38 @@ export class HomePage {
   }
   //this is to get group from database and local
   //using the latest and sync the older version.
-  setupGroups(user: User) { //RETRIEVING FROM FDB IS WORKING
-    user = this.demoAddGroupId(user);
+  setupGroups(user: User) {
+    //user = this.demoAddGroupId(user);
     let groupIds: string[] = user.groupIds;
     //console.log(groupIds);
     if (this.isOnline) {
-      groupIds.forEach(groupId => {
-        this.fdb
-          .object<Group>("/groups/" + groupId)
-          .valueChanges()
-          .subscribe(_data => {
-            console.log("retrieving group")
-            console.log(_data);
-            this.groups.push(_data);
-            this.storage.set(groupId,_data);
+      this.fdb
+        .object("/users/" + user.id)
+        .valueChanges()
+        .subscribe(_data => {
+          let newGroups = [];
+          groupIds = _data["groupIds"];
+          groupIds.forEach(groupId => {
+            let subs = this.fdb
+              .object<Group>("/groups/" + groupId)
+              .valueChanges()
+              .subscribe(_data => {
+                console.log(groupId);
+                if (_data != null) {
+                  newGroups.push(_data);
+                  this.storage.set(groupId, _data);
+                }
+                subs.unsubscribe();
+              });
           });
-      });
-    }else{
+          this.groups = newGroups;
+        });
+    } else {
       groupIds.forEach(groupId => {
-        this.storage.get(groupId).then(_group =>{
+        this.storage.get(groupId).then(_group => {
           this.groups.push(_group);
-        })
-      })
+        });
+      });
     }
   }
 
@@ -130,13 +155,11 @@ export class HomePage {
     return firstLoad == null || firstLoad ? true : false;
   }
 
-  cardClick(item: TodoItems) {
-    this.navCtrl.push(TodoDetailsPage, { parameter: item });
+  cardClick(group: any) {
+    this.navCtrl.push(GroupHomePage, { parameter: group });
   }
 
-  addTodoList() {
-    this.navCtrl.push(CreateTodoPage, { params: this.items });
-  }
+  addTodoList() {}
 
   addGroup() {}
 }

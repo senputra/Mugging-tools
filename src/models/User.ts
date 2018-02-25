@@ -23,11 +23,11 @@ export class User {
     this.email = email;
     this.phoneNumber = phoneNumber;
     this.id = id;
-
+    this.groupIds = groupIds;
     this.lastChangeTime = Date.now();
   }
 
-  public getGroupIds(){
+  public getGroupIds() {
     return this.groupIds;
   }
 

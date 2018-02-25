@@ -1,4 +1,4 @@
-import { Storage } from '@ionic/storage';
+import { Storage } from "@ionic/storage";
 import { AngularFireDatabase } from "angularfire2/database";
 import { User } from "./../../models/User";
 import { HomePage } from "./../home/home";
@@ -6,9 +6,15 @@ import { GooglePlus } from "@ionic-native/google-plus";
 import { LoginPage } from "./../login/login";
 import { SignupPage } from "./../signup/signup";
 import { Component } from "@angular/core";
-import { IonicPage, NavController, NavParams } from "ionic-angular";
+import {
+  IonicPage,
+  NavController,
+  NavParams,
+  MenuController
+} from "ionic-angular";
 import firebase from "firebase";
 import { ToastController } from "ionic-angular";
+import { AngularFireAuth } from 'angularfire2/auth';
 
 //TODO: create animation where the welcome page is pushed upwards for login and sign up purposes.
 
@@ -26,8 +32,12 @@ export class WelcomePage {
     private googlePlus: GooglePlus,
     private toastCtrl: ToastController,
     private mfdb: AngularFireDatabase,
-    private storage:Storage
+    private storage: Storage,
+    public menuCtrl: MenuController,
+    public afAuth: AngularFireAuth,
   ) {
+    menuCtrl.enable(false);
+
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         this.userProfile = user;
@@ -38,13 +48,16 @@ export class WelcomePage {
   }
 
   signup(): void {
+    this.menuCtrl.enable(true);
     this.navCtrl.push(SignupPage);
   }
   login(): void {
+    this.menuCtrl.enable(true);
     this.navCtrl.push(LoginPage);
   }
 
   doLoginG() {
+    this.menuCtrl.enable(true);
     //do all the the login stuff here ==> syncing local data with firebase
     this.googlePlus
       .login({
@@ -53,6 +66,7 @@ export class WelcomePage {
         offline: true
       })
       .then(res => {
+        
         firebase
           .auth()
           .signInWithCredential(
@@ -65,17 +79,12 @@ export class WelcomePage {
             this.saveUser(userData);
 
             //pop a toast
-            let toast = this.toastCtrl
-            .create({
+            let toast = this.toastCtrl.create({
               message: userData.displayName + " is logged in.",
               duration: 1500,
               position: "top"
             });
             toast.present();
-
-            //go to the homepage
-            this.navCtrl.pop();
-            
           })
           .catch(error =>
             console.log("Firebase failure: " + JSON.stringify(error))
@@ -101,16 +110,27 @@ export class WelcomePage {
       // this value to authenticate with your backend server, if
       // you have one. Use User.getToken() instead.
 
-      let newUser: User = new User(name, email, 0, uid, [], []);
+      let subscription = this.mfdb
+        .list<string>("/users/" + uid + "/groupIds/")
+        .valueChanges()
+        .subscribe(_data => {
+          let newUser: User = new User(name, email, 0, uid, _data, []);
+          console.log("newUser" + newUser);
+          //this line is to save user to firebase
+          this.mfdb.object("/users/" + uid).update(newUser);
 
-      //this line is to save user to firebase
-      this.mfdb.object('/users/'+uid).set(newUser);
+          //this line is to save to local database
+          this.storage.set("user", newUser);
+          this.storage.set("userId", uid);
+          console.log("Welcome : " + JSON.stringify(newUser));
+          //TODO: check if the save to local function works properly.
 
-      //this line is to save to local database
-      this.storage.set('user',newUser);
-      console.log("Welcome : "+JSON.stringify(newUser));
-      //TODO: check if the save to local function works properly.
-      return;
+          //go to the homepage
+          this.navCtrl.setRoot(HomePage);
+
+          subscription.unsubscribe();
+          return;
+        });
     }
   }
 }

@@ -1,0 +1,49 @@
+<!--
+  Generated template for the GroupHomePage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>{{page_title}}</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <ion-card *ngFor="let timeline of timelines; let i=index" tappable (click)="agendaClick(timeline)" ion-long-press [interval]="800"
+    (onPressing)="deleteTimeline(timeline,i)">
+    <ion-card-header>
+      <h5>{{timeline.title}}</h5>
+    </ion-card-header>
+    <ion-card-content>
+      <p>{{timeline.id}}</p>
+    </ion-card-content>
+  </ion-card>
+  <ion-card *ngFor="let chatroom of chatrooms" tappable (click)="chatroomClick(group)">
+    <ion-card-header>
+      <h5>{{chatroom.title}}</h5>
+    </ion-card-header>
+    <ion-card-content>
+      <p>{{chatroom.id}}</p>
+    </ion-card-content>
+  </ion-card>
+  <ion-card *ngFor="let timeSchedule of timeSchedules" tappable (click)="timeScheduleClick(group)">
+    <ion-card-header>
+      <h5>{{timeSchedule.title}}</h5>
+    </ion-card-header>
+    <ion-card-content>
+      <p>{{timeSchedule.id}}</p>
+    </ion-card-content>
+  </ion-card>
+
+
+  <ion-fab bottom right>
+    <button ion-fab mini (click)="addTimeline()">
+      <ion-icon name="add"></ion-icon>
+    </button>
+  </ion-fab>
+</ion-content>
