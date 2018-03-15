@@ -66,7 +66,6 @@ export class WelcomePage {
         offline: true
       })
       .then(res => {
-        
         firebase
           .auth()
           .signInWithCredential(
@@ -85,6 +84,9 @@ export class WelcomePage {
               position: "top"
             });
             toast.present();
+            
+            //go to the homepage
+            this.navCtrl.setRoot(HomePage);
           })
           .catch(error =>
             console.log("Firebase failure: " + JSON.stringify(error))
@@ -125,8 +127,7 @@ export class WelcomePage {
           console.log("Welcome : " + JSON.stringify(newUser));
           //TODO: check if the save to local function works properly.
 
-          //go to the homepage
-          this.navCtrl.setRoot(HomePage);
+
 
           subscription.unsubscribe();
           return;

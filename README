@@ -1,0 +1,5 @@
+IONIC DEPENDENCIES USED:
+- Angularfire2
+	npm install firebase angularfire2 --save
+
+
