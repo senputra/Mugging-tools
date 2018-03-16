@@ -5,6 +5,10 @@ import { AngularFireDatabase } from "angularfire2/database";
 import { Component } from "@angular/core";
 import { IonicPage, NavController, NavParams } from "ionic-angular";
 import { CreateTimelinePage } from "../create-timeline/create-timeline";
+import { AngularFirestore } from 'angularfire2/firestore';
+import { GroupId } from '../../models/GroupId';
+import { Observable } from '@firebase/util';
+import { TimelineId } from '../../models/TimelineId'
 
 /**
  * Generated class for the GroupHomePage page.
@@ -18,46 +22,34 @@ import { CreateTimelinePage } from "../create-timeline/create-timeline";
   selector: "page-group-home",
   templateUrl: "group-home.html"
 })
+/*
+* At Group home page, the contents of group are displayed
+* 1. Get gid from parameters passed on from main HomePage
+* 2. Show the timelines [focus on this one first], chatrooms, and timeschedule
+* 3. When the timeline or othr stuff is clicked, go to those pages
+* 4. long press to delete
+*/
 export class GroupHomePage {
   page_title: string;
-  timelines: Timeline[];
+  timelineIds: Observable<TimelineId[]>;
   gid: string;
 
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
-    private fdb: AngularFireDatabase,
-    public authService:AuthService,
-  ) {}
+    private afs: AngularFirestore,
+  ) { }
 
   ionViewDidLoad() {
-    console.log("group home "+ this.authService.authenticated)
-    console.log("group home "+ this.authService.currentUserDisplayName)
-    console.log("group home "+ this.authService.currentUserId)
-    //get the clicked card group
-    let group = this.navParams.get("parameter");
-    this.page_title = group["name"];
-    this.gid = group["id"];
-    this.fdb
-      .list<string>("/groups/" + group["id"] + "/timelineIds/")
-      .valueChanges()
-      .subscribe(_data => {
-        //getting all the timeline Ids
-        let newTimelines: Timeline[] = [];
-        _data.forEach(timelineId => {
-          let subs = this.fdb //retrieve data of a timeline from a timeline id
-            .object<Timeline>("/timelines/" + timelineId)
-            .valueChanges()
-            .subscribe(_datatimeline => {
-              // console.log(timelineId);
-              if (_data != null) {
-                newTimelines.push(_datatimeline);
-                subs.unsubscribe();
-              }
-            });
-        });
-        this.timelines = newTimelines;
-      });
+    //-- Step 1. ----------------------------------------
+    let groupId: GroupId = this.navParams.get("parameter");
+    this.page_title = groupId.title;
+    this.gid = groupId.groupId
+
+    //-- Step 2. ----------- Showing the timelines from Firestore--------------
+    let timelineIdRef = this.afs.collection("/groups/" + this.gid + "/timelineIds/");
+    //console.log(this.gid);
+    this.timelineIds = timelineIdRef.valueChanges();
   }
 
   addTimeline() {
@@ -65,34 +57,28 @@ export class GroupHomePage {
       parameter: this.navParams.get("parameter")["id"]
     });
   }
-  agendaClick(agenda: Timeline) {
+
+  //-- Step 3. -------------- Event when the timeline is tapped---
+  agendaClick(timelineId: TimelineId) {
     // Going to timeline home page with Agenda (containing id, title, and days)
-    this.navCtrl.push(TimelineHomePage, { parameter: agenda });
+    this.navCtrl.push(TimelineHomePage, { parameter: timelineId });
   }
 
   deleteTimeline(timeline, index) {
     // console.log(index+ " deleted");
 
     //delete timeline from the timelineIds in the group
-    let subscription = this.fdb
-      .list<string>("/groups/" + this.gid + "/timelineIds/")
-      .valueChanges()
-      .subscribe(_data => {
-        if (index > -1) {
-          _data.splice(index, 1);
-        }
-        this.fdb.list("/groups/" + this.gid).set("timelineIds", _data);
-        subscription.unsubscribe();
-      });
-    //delete timeline from the firebase
-    this.fdb.object("/timelines/" + timeline.id).remove();
-  }
-
-  reIndexingArray(array) {
-    let newArray = [];
-    array.forEach(element => {
-      newArray.push(element);
-    });
-    return newArray;
+    // let subscription = this.fdb
+    //   .list<string>("/groups/" + this.gid + "/timelineIds/")
+    //   .valueChanges()
+    //   .subscribe(_data => {
+    //     if (index > -1) {
+    //       _data.splice(index, 1);
+    //     }
+    //     this.fdb.list("/groups/" + this.gid).set("timelineIds", _data);
+    //     subscription.unsubscribe();
+    //   });
+    // //delete timeline from the firebase
+    // this.fdb.object("/timelines/" + timeline.id).remove();
   }
 }

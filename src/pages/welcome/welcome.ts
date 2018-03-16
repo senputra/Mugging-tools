@@ -60,8 +60,17 @@ export class WelcomePage {
   async webLogin() {
     try {
       const provider = new firebase.auth.GoogleAuthProvider();
-      const credential = await this.afAuth.auth.signInWithPopup(provider);
-      this.navCtrl.setRoot(WelcomePage);
+      const credential = await this.afAuth.auth.signInWithPopup(provider)
+        .then(_res => {
+          //pop a toast
+          let toast = this.toastCtrl.create({
+            message: _res.displayName + " is logged in.",
+            duration: 1500,
+            position: "top"
+          });
+          this.navCtrl.setRoot(HomePage);
+        });
+
     } catch (err) {
       console.log(err);
     }
@@ -83,7 +92,7 @@ export class WelcomePage {
               position: "top"
             });
             toast.present();
-            this.navCtrl.setRoot(WelcomePage)
+            this.navCtrl.setRoot(HomePage)
           });
       })
     } catch (err) {

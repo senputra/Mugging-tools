@@ -8,6 +8,7 @@ import { Platform, Nav } from "ionic-angular";
 import { StatusBar } from "@ionic-native/status-bar";
 import { SplashScreen } from "@ionic-native/splash-screen";
 import { Page } from "ionic-angular/navigation/nav-util";
+import { AngularFireAuth } from "angularfire2/auth";
 
 @Component({
   templateUrl: "app.html"
@@ -22,7 +23,8 @@ export class MyApp {
   constructor(
     platform: Platform,
     statusBar: StatusBar,
-    splashScreen: SplashScreen
+    splashScreen: SplashScreen,
+    private afAuth: AngularFireAuth
   ) {
     this.pages = [
       { title: "Create Group", component: CreateGroupPage },
@@ -51,5 +53,9 @@ export class MyApp {
         this.nav.setRoot(page.component);
         break;
     }
+  }
+
+  signOut(){
+    this.afAuth.auth.signOut();
   }
 }

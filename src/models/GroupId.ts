@@ -1,4 +1,4 @@
 export interface GroupId{
     groupId:string;
-    name:string;
+    title:string;
 }

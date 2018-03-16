@@ -53,6 +53,9 @@ export class HomePage {
         console.log("Not logged in");
         this.navCtrl.setRoot(WelcomePage);
       } else {
+
+        this.page_title = _data.displayName;
+
         console.log("Authenticated");
         //Toast greeting the user
         let toast = this.toastCtrl.create({
@@ -80,19 +83,13 @@ export class HomePage {
 
   //getting groups from database (input is the userId)
   setupGroups(uid: string) {
-    let groupRef = this.afs.collection("/users/{uid}/groupIds");
+    let groupRef = this.afs.collection("/users/"+uid+"/groupIds");
     this.groupIds = groupRef.valueChanges();
+    this.groupIds.subscribe(_data => {console.log(_data)});
   }
 
-  isFirstLoad(storage: Storage): boolean {
-    //check if there is some data saved in the DB
-    let firstLoad = storage.get("firstLoad");
-
-    return firstLoad == null || firstLoad ? true : false;
-  }
-
-  cardClick(group: any) {
-    this.navCtrl.push(GroupHomePage, { parameter: group });
+  cardClick(groupId: GroupId) {
+    this.navCtrl.push(GroupHomePage, { parameter: groupId });
   }
 
   addTodoList() { }
