@@ -7,12 +7,12 @@
 </ion-header>
 
 <ion-content>
-  <ion-card *ngFor="let group of groups" tappable (click)="cardClick(group)">
+  <ion-card *ngFor="let groupId of groupIds | async" tappable (click)="cardClick(group)">
     <ion-card-header>
-      <h5>{{group.name}}</h5>
+      <h5>{{groupId.name}}</h5>
     </ion-card-header>
     <ion-card-content>
-      <p>{{group.id}}</p>
+      <p>{{groupId.groupId}}</p>
     </ion-card-content>
   </ion-card>
 

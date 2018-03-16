@@ -1,14 +1,13 @@
-import { AuthService } from './../service/auth.service';
-import { AngularFireAuth } from 'angularfire2/auth';
-import { GroupJoinPage } from './../pages/group-join/group-join';
-import { CreatePlanPage } from './../pages/create-plan/create-plan';
-import { GroupHomePage } from './../pages/group-home/group-home';
 import { BrowserModule } from "@angular/platform-browser";
 import { ErrorHandler, NgModule } from "@angular/core";
 import { IonicApp, IonicErrorHandler, IonicModule } from "ionic-angular";
 import { SplashScreen } from "@ionic-native/splash-screen";
 import { StatusBar } from "@ionic-native/status-bar";
 
+
+import { GroupJoinPage } from './../pages/group-join/group-join';
+import { CreatePlanPage } from './../pages/create-plan/create-plan';
+import { GroupHomePage } from './../pages/group-home/group-home';
 import { MyApp } from "./app.component";
 import { HomePage } from "../pages/home/home";
 import { TodoDetailsPage } from "../pages/todo-details/todo-details";
@@ -20,14 +19,12 @@ import { CreateGroupPage } from "../pages/create-group/create-group";
 import { CreateTimelinePage } from "../pages/create-timeline/create-timeline";
 import { TimelineHomePage } from '../pages/timeline-home/timeline-home';
 
-import { IonicStorageModule } from "@ionic/storage";
-import { AngularFireModule } from "angularfire2";
-import {
-  AngularFireDatabaseModule,
-  AngularFireDatabase
-} from "angularfire2/database";
-import { AngularFireAuthModule } from 'angularfire2/auth';
-import {GooglePlus} from "@ionic-native/google-plus";
+import { AngularFireModule } from 'angularfire2';
+import { AngularFirestoreModule } from 'angularfire2/firestore';
+import { AngularFireAuthModule, AngularFireAuth } from 'angularfire2/auth'; 
+
+import { GooglePlus } from '@ionic-native/google-plus';
+
 import { LongPressModule } from 'ionic-long-press';
 
 let firebaseConfig = {
@@ -58,9 +55,9 @@ let firebaseConfig = {
   imports: [
     BrowserModule,
     IonicModule.forRoot(MyApp),
-    IonicStorageModule.forRoot(),
-    AngularFireDatabaseModule,
+    AngularFirestoreModule.enablePersistence(),
     AngularFireModule.initializeApp(firebaseConfig),
+    AngularFireAuthModule,
     LongPressModule
   ],
   bootstrap: [IonicApp],
@@ -82,11 +79,8 @@ let firebaseConfig = {
   providers: [
     StatusBar,
     SplashScreen,
-    AngularFireDatabase,
-    AngularFireAuth,
-    AuthService,
     GooglePlus,
     { provide: ErrorHandler, useClass: IonicErrorHandler }
   ]
 })
-export class AppModule {}
+export class AppModule { }

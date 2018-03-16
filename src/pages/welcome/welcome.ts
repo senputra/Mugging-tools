@@ -1,5 +1,5 @@
-import { Storage } from "@ionic/storage";
-import { AngularFireDatabase } from "angularfire2/database";
+
+
 import { User } from "./../../models/User";
 import { HomePage } from "./../home/home";
 import { GooglePlus } from "@ionic-native/google-plus";
@@ -10,9 +10,10 @@ import {
   IonicPage,
   NavController,
   NavParams,
-  MenuController
+  MenuController,
+  Platform
 } from "ionic-angular";
-import firebase from "firebase";
+import * as firebase from 'firebase/app';
 import { ToastController } from "ionic-angular";
 import { AngularFireAuth } from 'angularfire2/auth';
 
@@ -31,20 +32,12 @@ export class WelcomePage {
     public navParams: NavParams,
     private googlePlus: GooglePlus,
     private toastCtrl: ToastController,
-    private mfdb: AngularFireDatabase,
-    private storage: Storage,
     public menuCtrl: MenuController,
     public afAuth: AngularFireAuth,
+    private platform: Platform,
+
   ) {
     menuCtrl.enable(false);
-
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        this.userProfile = user;
-      } else {
-        this.userProfile = null;
-      }
-    });
   }
 
   signup(): void {
@@ -57,44 +50,48 @@ export class WelcomePage {
   }
 
   doLoginG() {
-    this.menuCtrl.enable(true);
-    //do all the the login stuff here ==> syncing local data with firebase
-    this.googlePlus
-      .login({
+    if (this.platform.is('cordova')) {
+      this.mobileLogin();
+    } else {
+      this.webLogin();
+    }
+  }
+
+  async webLogin() {
+    try {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      const credential = await this.afAuth.auth.signInWithPopup(provider);
+      this.navCtrl.setRoot(WelcomePage);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async mobileLogin() {
+    try {
+      const gPlusUser = await this.googlePlus.login({
         webClientId:
           "797472639847-mphniu062nhle2i7dun64v7komac530a.apps.googleusercontent.com",
         offline: true
-      })
-      .then(res => {
-        firebase
-          .auth()
-          .signInWithCredential(
-            firebase.auth.GoogleAuthProvider.credential(res.idToken)
-          )
-          .then(userData => {
-            console.log("Firebase userData: " + JSON.stringify(userData));
-
-            //save the user data locally
-            this.saveUser(userData);
-
+      }).then(result => {
+        return this.afAuth.auth.signInWithCredential(firebase.auth.GoogleAuthProvider.credential(result.idToken))
+          .then(_res => {
             //pop a toast
             let toast = this.toastCtrl.create({
-              message: userData.displayName + " is logged in.",
+              message: _res.displayName + " is logged in.",
               duration: 1500,
               position: "top"
             });
             toast.present();
-            
-            //go to the homepage
-            this.navCtrl.setRoot(HomePage);
-          })
-          .catch(error =>
-            console.log("Firebase failure: " + JSON.stringify(error))
-          );
+            this.navCtrl.setRoot(WelcomePage)
+          });
       })
-      .catch(err => console.error("Error: ", err));
+    } catch (err) {
+      console.log(err);
+    }
   }
 
+  /*
   //save user both in firebase Database and local database.
   saveUser(user: any) {
     if (user != null) {
@@ -133,5 +130,5 @@ export class WelcomePage {
           return;
         });
     }
-  }
+  }*/
 }
