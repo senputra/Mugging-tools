@@ -1,6 +1,3 @@
-
-
-import { User } from "./../../models/User";
 import { HomePage } from "./../home/home";
 import { GooglePlus } from "@ionic-native/google-plus";
 import { LoginPage } from "./../login/login";
@@ -60,14 +57,16 @@ export class WelcomePage {
   async webLogin() {
     try {
       const provider = new firebase.auth.GoogleAuthProvider();
-      const credential = await this.afAuth.auth.signInWithPopup(provider)
+      //const credential = [continue with the bottom line]
+      await this.afAuth.auth.signInWithPopup(provider)
         .then(_res => {
           //pop a toast
           let toast = this.toastCtrl.create({
             message: _res.displayName + " is logged in.",
-            duration: 1500,
+            duration: 3000,
             position: "top"
           });
+          toast.present();
           this.navCtrl.setRoot(HomePage);
         });
 
@@ -78,7 +77,7 @@ export class WelcomePage {
 
   async mobileLogin() {
     try {
-      const gPlusUser = await this.googlePlus.login({
+      await this.googlePlus.login({
         webClientId:
           "797472639847-mphniu062nhle2i7dun64v7komac530a.apps.googleusercontent.com",
         offline: true

@@ -1,13 +1,10 @@
-import { AuthService } from './../../service/auth.service';
 import { TimelineHomePage } from "./../timeline-home/timeline-home";
-import { Timeline } from "./../../models/Timeline";
-import { AngularFireDatabase } from "angularfire2/database";
 import { Component } from "@angular/core";
 import { IonicPage, NavController, NavParams } from "ionic-angular";
 import { CreateTimelinePage } from "../create-timeline/create-timeline";
-import { AngularFirestore } from 'angularfire2/firestore';
+import { AngularFirestore, AngularFirestoreCollection } from 'angularfire2/firestore';
 import { GroupId } from '../../models/GroupId';
-import { Observable } from '@firebase/util';
+import { Observable } from "rxjs/Observable";
 import { TimelineId } from '../../models/TimelineId'
 
 /**
@@ -47,19 +44,21 @@ export class GroupHomePage {
     this.gid = groupId.groupId
 
     //-- Step 2. ----------- Showing the timelines from Firestore--------------
-    let timelineIdRef = this.afs.collection("/groups/" + this.gid + "/timelineIds/");
+    let timelineIdRef:AngularFirestoreCollection<TimelineId> = this.afs.collection("/groups/" + this.gid + "/timelineIds/");
     //console.log(this.gid);
     this.timelineIds = timelineIdRef.valueChanges();
   }
 
+
+  //-- Step 4. ---------------- When add button is tapped go to add timeline page
   addTimeline() {
     this.navCtrl.push(CreateTimelinePage, {
-      parameter: this.navParams.get("parameter")["id"]
+      parameter: this.gid
     });
   }
 
   //-- Step 3. -------------- Event when the timeline is tapped---
-  agendaClick(timelineId: TimelineId) {
+  timelineClick(timelineId: TimelineId) {
     // Going to timeline home page with Agenda (containing id, title, and days)
     this.navCtrl.push(TimelineHomePage, { parameter: timelineId });
   }

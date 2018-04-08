@@ -1,8 +1,9 @@
-import { Matter } from "./../../models/Matter";
-import { Day } from "./../../models/Day";
-import { AngularFireDatabase } from "angularfire2/database";
 import { Component } from "@angular/core";
 import { IonicPage, NavController, NavParams } from "ionic-angular";
+import { AngularFirestore } from "angularfire2/firestore";
+import { Flag } from "../../models/Flag";
+import { DateTime } from 'luxon';
+
 
 /**
  * Generated class for the CreatePlanPage page.
@@ -11,46 +12,38 @@ import { IonicPage, NavController, NavParams } from "ionic-angular";
  * Ionic pages and navigation.
  */
 
+/**
+ * Create Plan, adds the number of event in one timeline
+ * 1. get the timeline id from the parameter
+ * 2. get inputs from the user
+ * 3. push it to firestore 
+ */
 @IonicPage()
 @Component({
   selector: "page-create-plan",
   templateUrl: "create-plan.html"
 })
 export class CreatePlanPage {
-  aid: string; //agenda id
-  planName: string;
+  tId: string; //timeline id
+  eventTitle: string;
+  eventDeadline: Date;
+  newEvent: Flag;
 
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
-    public fdb: AngularFireDatabase
-  ) {}
+    public afs: AngularFirestore,
+  ) { }
 
   ionViewDidLoad() {
     //retrieve the TimelineId form the paramater
-    this.aid = this.navParams.get("parameter");
+    this.tId = this.navParams.get("parameter");
   }
 
   doAddPlan() {
-    let subscription = this.fdb
-      .list<Day>("/timelines/" + this.aid + "/days")
-      .valueChanges()
-      .subscribe(_data => {
-        //this is the data of what is in the day || it will be a list of Day
-        let oldPlans = _data;
 
-        let newMatters: Matter[] = [new Matter(this.planName, "", "", true)];
-        console.log("planName" + this.planName);
-        let newPlan = new Day(new Date().getTime(), newMatters);
-
-        oldPlans.push(newPlan);
-        subscription.unsubscribe();
-        console.log("_oldplans" + oldPlans);
-        oldPlans.forEach(element => {
-          console.log("oldplans =>" + element.matters[0].title);
-        });
-        console.log("_aid" + this.aid);
-        this.fdb.object("/timelines/" + this.aid).update({ days: oldPlans });
-      });
+    let eventRef = this.afs.collection("/timelines/" + this.tId + "/events/")
+    this.newEvent = { title: this.eventTitle, deadline: DateTime.fromISO(this.eventDeadline).toISO() };
+    eventRef.add(this.newEvent);
   }
 }

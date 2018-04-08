@@ -15,17 +15,17 @@
 
 <ion-content padding>
     
-  <ion-card *ngFor="let plan of plans; let i=index" tappable (click)="planClick(plan)" ion-long-press [interval]="800" (onPressing)="deletePlan(plan,i)">
+  <ion-card *ngFor="let event of events | async" tappable (click)="planClick(event)" ion-long-press [interval]="800" (onPressing)="deletePlan(plan,i)">
     <ion-card-header>
-      <h5>{{getDate(plan)}}</h5>
+      <h5>{{event.title}}</h5>
     </ion-card-header>
     <ion-card-content>
-      <p>{{getDescription(plan)}}</p>
+      <p>{{event.deadline}}</p>
     </ion-card-content>
   </ion-card>
 
   <ion-fab bottom right>
-    <button ion-fab mini (click)="addAgenda()">
+    <button ion-fab mini (click)="addEvent()">
       <ion-icon name="add"></ion-icon>
     </button>
   </ion-fab>

@@ -1,19 +1,15 @@
 import { GroupHomePage } from "./../group-home/group-home";
 
 import { WelcomePage } from "./../welcome/welcome";
-import { CreateTodoPage } from "./../create-todo/create-todo";
-import { TodoItems } from "./../../models/TodoItems";
 import { Component } from "@angular/core";
 import { NavController } from "ionic-angular";
 
 import { ToastController } from "ionic-angular";
 import { Observable } from "rxjs/Observable";
-import firebase from "firebase";
-import { AngularFirestore } from 'angularfire2/firestore';
+import { AngularFirestore, AngularFirestoreCollection } from 'angularfire2/firestore';
 import { AngularFireAuth } from "angularfire2/auth";
 
 import { User } from "./../../models/User";
-import { Group } from "./../../models/Group";
 import { GroupId } from "./../../models/GroupId";
 
 @Component({
@@ -83,7 +79,7 @@ export class HomePage {
 
   //getting groups from database (input is the userId)
   setupGroups(uid: string) {
-    let groupRef = this.afs.collection("/users/"+uid+"/groupIds");
+    let groupRef:AngularFirestoreCollection<GroupId> = this.afs.collection("/users/"+uid+"/groupIds");
     this.groupIds = groupRef.valueChanges();
     this.groupIds.subscribe(_data => {console.log(_data)});
   }

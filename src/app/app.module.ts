@@ -10,18 +10,16 @@ import { CreatePlanPage } from './../pages/create-plan/create-plan';
 import { GroupHomePage } from './../pages/group-home/group-home';
 import { MyApp } from "./app.component";
 import { HomePage } from "../pages/home/home";
-import { TodoDetailsPage } from "../pages/todo-details/todo-details";
 import { SignupPage } from "./../pages/signup/signup";
 import { LoginPage } from "./../pages/login/login";
 import { WelcomePage } from "./../pages/welcome/welcome";
-import { CreateTodoPage } from "./../pages/create-todo/create-todo";
 import { CreateGroupPage } from "../pages/create-group/create-group";
 import { CreateTimelinePage } from "../pages/create-timeline/create-timeline";
 import { TimelineHomePage } from '../pages/timeline-home/timeline-home';
 
 import { AngularFireModule } from 'angularfire2';
 import { AngularFirestoreModule } from 'angularfire2/firestore';
-import { AngularFireAuthModule, AngularFireAuth } from 'angularfire2/auth'; 
+import { AngularFireAuthModule } from 'angularfire2/auth'; 
 
 import { GooglePlus } from '@ionic-native/google-plus';
 
@@ -40,8 +38,6 @@ let firebaseConfig = {
   declarations: [
     MyApp,
     HomePage,
-    TodoDetailsPage,
-    CreateTodoPage,
     WelcomePage,
     LoginPage,
     SignupPage,
@@ -64,8 +60,6 @@ let firebaseConfig = {
   entryComponents: [
     MyApp,
     HomePage,
-    TodoDetailsPage,
-    CreateTodoPage,
     WelcomePage,
     LoginPage,
     SignupPage,

@@ -20,8 +20,14 @@
     </ion-item>
 
     <ion-item>
-      <ion-input type="text" [(ngModel)]="planName"></ion-input>
+      <ion-input type="text" [(ngModel)]="eventTitle"></ion-input>
     </ion-item>
+
+    <ion-item>
+      <ion-label>Date</ion-label>
+      <ion-datetime displayFormat="MM/YYYY" pickerFormat="MMMM YYYY" [(ngModel)]="eventDeadline"></ion-datetime>
+    </ion-item>
+
   </ion-list>
 
   <button ion-button full outline (click)="doAddPlan()">leggo</button>

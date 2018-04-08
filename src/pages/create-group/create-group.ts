@@ -32,24 +32,24 @@ export class CreateGroupPage {
   }
 
   demoCreateGroup() {
-    let name = "Demo Group";
-    let adminId = ["1A91VdFqSGdpsQMvsHEDXQVZi6M2"];
-    let id = "GP123456789";
-    let newGroup: Group = new Group(name, adminId, id);
-    this.upload(newGroup);
-    id = "GP123456780";
-    newGroup = new Group(name, adminId, id);
-    this.upload(newGroup);
+    // let name = "Demo Group";
+    // let adminId = ["1A91VdFqSGdpsQMvsHEDXQVZi6M2"];
+    // let id = "GP123456789";
+    // let newGroup: Group = new Group(name, adminId, id);
+    // this.upload(newGroup);
+    // id = "GP123456780";
+    // newGroup = new Group(name, adminId, id);
+    // this.upload(newGroup);
   }
 
   upload(group: Group) {
-    //local----------
-    this.storage.set(group.id, group);
-    //------------------
+    // //local----------
+    // this.storage.set(group.id, group);
+    // //------------------
 
-    //online----------------
-    this.fdb.object("/groups/" + group.id).set(group);
-    //-------------------
+    // //online----------------
+    // this.fdb.object("/groups/" + group.id).set(group);
+    // //-------------------
   }
 
   onChangeTitle() {
@@ -71,22 +71,23 @@ export class CreateGroupPage {
   }
 
   doCreateGroup() {
-    this.storage.get("user").then(_data => {
-      let currentUser = _data;
-      let oldGroupId = this.getCurrentGroups(_data);
+  //   this.storage.get("user").then(_data => {
+  //     let currentUser = _data;
+  //     let oldGroupId = this.getCurrentGroups(_data);
 
-      let newGroup = new Group(
-        this.name,
-        [currentUser.id],
-        "GP" + Date.now().toString(36) + currentUser.id.slice(-5)
-      );
-      this.upload(newGroup);
+  //     let newGroup = new Group(
+  //       this.name,
+  //       [currentUser.id],
+  //       "GP" + Date.now().toString(36) + currentUser.id.slice(-5)
+  //     );
+  //     this.upload(newGroup);
 
-      oldGroupId.push(newGroup.id);
-      currentUser.groupIds = oldGroupId;
+  //     oldGroupId.push(newGroup.id);
+  //     currentUser.groupIds = oldGroupId;
 
-      this.updateUser(currentUser, oldGroupId);
-      this.navCtrl.pop();
-    });
+  //     this.updateUser(currentUser, oldGroupId);
+  //     this.navCtrl.pop();
+  //   });
+  // }
   }
 }

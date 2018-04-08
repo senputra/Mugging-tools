@@ -14,13 +14,13 @@
 
 
 <ion-content padding>
-  <ion-card *ngFor="let timelineId of timelineIds | async; let i=index" tappable (click)="agendaClick(timelineId)" ion-long-press [interval]="800"
+  <ion-card *ngFor="let timelineId of timelineIds | async; let i=index" tappable (click)="timelineClick(timelineId)" ion-long-press [interval]="800"
     (onPressing)="deleteTimeline(timelineId,i)">
     <ion-card-header>
       <h5>{{timelineId.title}}</h5>
     </ion-card-header>
     <ion-card-content>
-      <p>{{timelineId.id}}</p>
+      <p>{{timelineId.timelineId}}</p>
     </ion-card-content>
   </ion-card>
   <ion-card *ngFor="let chatroom of chatrooms" tappable (click)="chatroomClick(group)">
